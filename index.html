@@ -17,6 +17,7 @@
         }
 
         input,
+        textarea,
         button {
             width: 100%;
             box-sizing: border-box;
@@ -26,6 +27,11 @@
             color: #0f0;
             border: 1px solid #0f0;
             font-family: monospace;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
         }
 
         button {
@@ -57,6 +63,11 @@
     placeholder="paste your webhook url"
 >
 
+<textarea
+    id="message"
+    placeholder="type the message you want to send"
+></textarea>
+
 <button onclick="sendMessages()">
     send 10 messages
 </button>
@@ -66,10 +77,16 @@
 <script>
 async function sendMessages() {
     const webhook = document.getElementById("webhook").value.trim();
+    const message = document.getElementById("message").value;
     const log = document.getElementById("log");
 
     if (!webhook) {
         log.textContent = "error: enter a webhook url.";
+        return;
+    }
+
+    if (!message.trim()) {
+        log.textContent = "error: enter a message.";
         return;
     }
 
@@ -84,17 +101,23 @@ async function sendMessages() {
                 },
                 body: JSON.stringify({
                     username: "tuis webhook spammer",
-                    content: "tuis webhook spammer"
+                    content: message
                 })
             });
 
             if (response.ok) {
                 log.textContent += "message sent\n";
             } else {
-                log.textContent += "message failed: http " + response.status + "\n";
+                log.textContent +=
+                    "message failed: http " +
+                    response.status +
+                    "\n";
             }
         } catch (error) {
-            log.textContent += "message failed: " + error.message + "\n";
+            log.textContent +=
+                "message failed: " +
+                error.message +
+                "\n";
         }
 
         await new Promise(resolve => setTimeout(resolve, 1000));
