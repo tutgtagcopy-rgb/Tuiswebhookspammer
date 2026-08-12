@@ -10,31 +10,40 @@
             color: #0f0;
             font-family: monospace;
             padding: 30px;
+            max-width: 700px;
+            margin: auto;
         }
 
-        h2 {
+        h1 {
             font-size: 24px;
         }
 
-        input,
-        textarea,
-        button {
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
+
+        input {
             width: 100%;
             box-sizing: border-box;
-            margin-top: 10px;
-            padding: 10px;
+            padding: 12px;
             background: #000;
             color: #0f0;
             border: 1px solid #0f0;
             font-family: monospace;
-        }
-
-        textarea {
-            min-height: 100px;
-            resize: vertical;
+            font-size: 15px;
         }
 
         button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+            font-family: monospace;
+            font-size: 15px;
             cursor: pointer;
         }
 
@@ -45,8 +54,8 @@
 
         #log {
             margin-top: 20px;
+            padding: 12px;
             border: 1px solid #0f0;
-            padding: 10px;
             min-height: 100px;
             white-space: pre-wrap;
         }
@@ -55,22 +64,23 @@
 
 <body>
 
-<h2>tuis webhook spammer</h2>
+<h1>tuis webhook spammer</h1>
 
+<label for="webhook">webhook url:</label>
 <input
     id="webhook"
     type="text"
-    placeholder="paste your webhook url"
+    placeholder="paste your webhook url here"
 >
 
-<textarea
+<label for="message">message:</label>
+<input
     id="message"
-    placeholder="type the message you want to send"
-></textarea>
+    type="text"
+    placeholder="type what you want the webhook to say"
+>
 
-<button onclick="sendMessages()">
-    send 10 messages
-</button>
+<button onclick="sendMessages()">send 10 messages</button>
 
 <div id="log">ready.</div>
 
@@ -86,7 +96,7 @@ async function sendMessages() {
     }
 
     if (!message.trim()) {
-        log.textContent = "error: enter a message.";
+        log.textContent = "error: type a message.";
         return;
     }
 
@@ -100,7 +110,6 @@ async function sendMessages() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    username: "tuis webhook spammer",
                     content: message
                 })
             });
@@ -108,16 +117,10 @@ async function sendMessages() {
             if (response.ok) {
                 log.textContent += "message sent\n";
             } else {
-                log.textContent +=
-                    "message failed: http " +
-                    response.status +
-                    "\n";
+                log.textContent += "failed: HTTP " + response.status + "\n";
             }
         } catch (error) {
-            log.textContent +=
-                "message failed: " +
-                error.message +
-                "\n";
+            log.textContent += "error: " + error.message + "\n";
         }
 
         await new Promise(resolve => setTimeout(resolve, 1000));
