@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>tuis webhook spammer</title>
+
     <style>
         body {
             background: #111;
@@ -11,7 +12,12 @@
             padding: 30px;
         }
 
-        input, textarea, button {
+        h2 {
+            font-size: 24px;
+        }
+
+        input,
+        button {
             width: 100%;
             box-sizing: border-box;
             margin-top: 10px;
@@ -40,30 +46,34 @@
         }
     </style>
 </head>
+
 <body>
 
-<h2>WEBHOOK TESTER</h2>
+<h2>tuis webhook spammer</h2>
 
-<input id="webhook" type="text" placeholder="Paste your webhook URL">
+<input
+    id="webhook"
+    type="text"
+    placeholder="paste your webhook url"
+>
 
-<textarea id="message" placeholder="Test message">Webhook test message</textarea>
+<button onclick="sendMessages()">
+    send 10 test messages
+</button>
 
-<button onclick="sendMessages()">SEND 10 TEST MESSAGES</button>
-
-<div id="log">Ready.</div>
+<div id="log">ready.</div>
 
 <script>
 async function sendMessages() {
     const webhook = document.getElementById("webhook").value.trim();
-    const message = document.getElementById("message").value;
     const log = document.getElementById("log");
 
     if (!webhook) {
-        log.textContent = "ERROR: Enter a webhook URL.";
+        log.textContent = "error: enter a webhook url.";
         return;
     }
 
-    log.textContent = "Starting test...\n";
+    log.textContent = "starting test...\n";
 
     for (let i = 1; i <= 10; i++) {
         try {
@@ -73,23 +83,30 @@ async function sendMessages() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    content: message + " [" + i + "/10]"
+                    username: "tuis webhook spammer",
+                    content: "tuis webhook spammer"
                 })
             });
 
             if (response.ok) {
-                log.textContent += "Sent message " + i + "/10\n";
+                log.textContent += "sent message " + i + "/10\n";
             } else {
-                log.textContent += "Message " + i + " failed: HTTP " + response.status + "\n";
+                log.textContent +=
+                    "message " + i +
+                    " failed: http " +
+                    response.status + "\n";
             }
         } catch (error) {
-            log.textContent += "Message " + i + " failed: " + error.message + "\n";
+            log.textContent +=
+                "message " + i +
+                " failed: " +
+                error.message + "\n";
         }
 
         await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    log.textContent += "\nFinished.";
+    log.textContent += "\nfinished.";
 }
 </script>
 
