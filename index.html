@@ -1,327 +1,152 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tuis Webhook Spammer</title>
+    <meta charset="UTF-8">
+    <title>Tuis Webhook Tester</title>
 
-<style>
-* {
-    box-sizing: border-box;
-}
+    <style>
+        body {
+            background: #e5e5e5;
+            color: #333;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 30px;
+        }
 
-body {
-    margin: 0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #111214;
-    color: #fff;
-    font-family: Arial, sans-serif;
-}
+        .box {
+            width: 500px;
+            margin: auto;
+            background: #ffffff;
+            border: 1px solid #bdbdbd;
+            padding: 20px;
+        }
 
-.container {
-    width: 420px;
-    background: #1e1f22;
-    padding: 25px;
-    border-radius: 14px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.4);
-}
+        h1 {
+            font-size: 22px;
+            margin: 0 0 20px 0;
+            color: #222;
+        }
 
-h1 {
-    margin-top: 0;
-    text-align: center;
-    font-size: 24px;
-}
+        label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #444;
+        }
 
-label {
-    display: block;
-    margin: 15px 0 7px;
-    color: #b5bac1;
-    font-size: 14px;
-}
+        input,
+        textarea {
+            width: 100%;
+            background: #f5f5f5;
+            color: #222;
+            border: 1px solid #aaa;
+            padding: 9px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            outline: none;
+        }
 
-input,
-textarea {
-    width: 100%;
-    border: 1px solid #3f4147;
-    background: #111214;
-    color: white;
-    border-radius: 8px;
-    padding: 11px;
-    outline: none;
-    font-size: 14px;
-}
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
 
-textarea {
-    height: 100px;
-    resize: vertical;
-}
+        input:focus,
+        textarea:focus {
+            border-color: #666;
+            background: #fff;
+        }
 
-input:focus,
-textarea:focus {
-    border-color: #5865f2;
-}
+        button {
+            margin-top: 16px;
+            padding: 9px 15px;
+            background: #d6d6d6;
+            color: #222;
+            border: 1px solid #999;
+            cursor: pointer;
+        }
 
-button {
-    width: 100%;
-    margin-top: 20px;
-    padding: 12px;
-    border: 0;
-    border-radius: 8px;
-    background: #5865f2;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
+        button:hover {
+            background: #c5c5c5;
+        }
 
-button:hover {
-    background: #4752c4;
-}
+        #status {
+            margin-top: 15px;
+            padding: 8px;
+            background: #f0f0f0;
+            border: 1px solid #c4c4c4;
+            font-size: 13px;
+        }
 
-button:disabled {
-    background: #3f4147;
-    cursor: not-allowed;
-}
-
-.stop {
-    background: #ed4245;
-}
-
-.stop:hover {
-    background: #c03537;
-}
-
-.status {
-    margin-top: 15px;
-    padding: 10px;
-    background: #111214;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #b5bac1;
-    min-height: 40px;
-}
-
-.progress {
-    margin-top: 10px;
-    height: 8px;
-    background: #111214;
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.bar {
-    height: 100%;
-    width: 0%;
-    background: #5865f2;
-    transition: width .2s;
-}
-</style>
+        .small {
+            color: #777;
+            font-size: 12px;
+            margin-top: 15px;
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="box">
 
-    <h1>Tuis Webhook Spammer</h1>
+    <h1>Tuis Webhook Tester</h1>
 
     <label>Webhook URL</label>
-
-    <input
-        id="webhook"
-        type="text"
-        placeholder="https://discord.com/api/webhooks/..."
-    >
+    <input id="webhook" type="text" placeholder="Paste webhook URL here">
 
     <label>Message</label>
+    <textarea id="message" placeholder="Type a test message"></textarea>
 
-    <textarea
-        id="message"
-        placeholder="Enter your message..."
-    ></textarea>
+    <button onclick="sendMessage()">Send Test Message</button>
 
-    <label>Number of Messages (1-50)</label>
+    <div id="status">Status: Ready</div>
 
-    <input
-        id="amount"
-        type="number"
-        min="1"
-        max="50"
-        value="1"
-    >
-
-    <button
-        id="sendBtn"
-        onclick="startSending()"
-    >
-        Send Messages
-    </button>
-
-    <button
-        id="stopBtn"
-        class="stop"
-        onclick="stopSending()"
-        disabled
-    >
-        Stop
-    </button>
-
-    <div class="progress">
-        <div
-            class="bar"
-            id="bar"
-        ></div>
-    </div>
-
-    <div
-        class="status"
-        id="status"
-    >
-        Ready.
+    <div class="small">
+        Sends one test message to the webhook.
     </div>
 
 </div>
 
 <script>
+function sendMessage() {
+    var webhook = document.getElementById("webhook").value.trim();
+    var message = document.getElementById("message").value;
+    var status = document.getElementById("status");
 
-let stopped = false;
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function stopSending() {
-    stopped = true;
-
-    document.getElementById("status").textContent =
-        "Stopping...";
-}
-
-async function startSending() {
-
-    const webhook =
-        document.getElementById("webhook").value.trim();
-
-    const message =
-        document.getElementById("message").value;
-
-    let amount =
-        parseInt(document.getElementById("amount").value);
-
-    if (!webhook) {
-        document.getElementById("status").textContent =
-            "Enter a webhook URL.";
-
+    if (webhook == "") {
+        status.innerText = "Status: Enter a webhook URL.";
         return;
     }
 
-    if (!message) {
-        document.getElementById("status").textContent =
-            "Enter a message.";
-
+    if (message == "") {
+        status.innerText = "Status: Enter a message.";
         return;
     }
 
-    if (isNaN(amount)) {
-        amount = 1;
-    }
+    status.innerText = "Status: Sending...";
 
-    amount = Math.max(
-        1,
-        Math.min(50, amount)
-    );
-
-    stopped = false;
-
-    document.getElementById("sendBtn").disabled = true;
-    document.getElementById("stopBtn").disabled = false;
-
-    const bar =
-        document.getElementById("bar");
-
-    const status =
-        document.getElementById("status");
-
-    bar.style.width = "0%";
-
-    for (let i = 0; i < amount; i++) {
-
-        if (stopped) {
-
-            status.textContent =
-                `Stopped after ${i} message(s).`;
-
-            break;
+    fetch(webhook, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            content: message
+        })
+    })
+    .then(function(response) {
+        if (response.ok) {
+            status.innerText = "Status: Message sent.";
+        } else {
+            status.innerText = "Status: Failed (HTTP " + response.status + ")";
         }
-
-        try {
-
-            const response = await fetch(
-                webhook,
-                {
-                    method: "POST",
-
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-
-                    body: JSON.stringify({
-                        content: message
-                    })
-                }
-            );
-
-            if (response.status === 429) {
-
-                status.textContent =
-                    "Discord rate limit reached. Stopping.";
-
-                break;
-            }
-
-            if (!response.ok) {
-
-                status.textContent =
-                    `Request failed: HTTP ${response.status}`;
-
-                break;
-            }
-
-            const completed = i + 1;
-
-            const percent =
-                (completed / amount) * 100;
-
-            bar.style.width =
-                percent + "%";
-
-            status.textContent =
-                `Sent ${completed}/${amount} messages.`;
-
-        } catch (error) {
-
-            status.textContent =
-                "Request failed. Check the webhook URL and browser permissions.";
-
-            break;
-        }
-
-        if (i < amount - 1) {
-            await sleep(2000);
-        }
-    }
-
-    if (!stopped) {
-
-        status.textContent =
-            `Finished. Sent up to ${amount} message(s).`;
-    }
-
-    document.getElementById("sendBtn").disabled = false;
-    document.getElementById("stopBtn").disabled = true;
+    })
+    .catch(function(error) {
+        status.innerText = "Status: Request failed.";
+    });
 }
-
 </script>
 
 </body>
