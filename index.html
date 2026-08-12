@@ -58,7 +58,7 @@
 >
 
 <button onclick="sendMessages()">
-    send 10 test messages
+    send 10 messages
 </button>
 
 <div id="log">ready.</div>
@@ -73,9 +73,9 @@ async function sendMessages() {
         return;
     }
 
-    log.textContent = "starting test...\n";
+    log.textContent = "starting...\n";
 
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 0; i < 10; i++) {
         try {
             const response = await fetch(webhook, {
                 method: "POST",
@@ -89,18 +89,12 @@ async function sendMessages() {
             });
 
             if (response.ok) {
-                log.textContent += "sent message " + i + "/10\n";
+                log.textContent += "message sent\n";
             } else {
-                log.textContent +=
-                    "message " + i +
-                    " failed: http " +
-                    response.status + "\n";
+                log.textContent += "message failed: http " + response.status + "\n";
             }
         } catch (error) {
-            log.textContent +=
-                "message " + i +
-                " failed: " +
-                error.message + "\n";
+            log.textContent += "message failed: " + error.message + "\n";
         }
 
         await new Promise(resolve => setTimeout(resolve, 1000));
