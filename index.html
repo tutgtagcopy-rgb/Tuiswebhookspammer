@@ -2,404 +2,94 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Tuis Webhook Tester</title>
-
+    <title>tuis webhook spammer</title>
     <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            background: #eeeeee;
-            color: #222;
-            font-family: Arial, Helvetica, sans-serif;
+        body {
+            background: #111;
+            color: #0f0;
+            font-family: monospace;
+            padding: 30px;
         }
 
-        .top {
-            background: #d0d0d0;
-            border-bottom: 1px solid #888;
-            padding: 10px 16px;
-        }
-
-        .top b {
-            font-size: 17px;
-        }
-
-        .main {
-            width: 700px;
-            margin: 24px auto;
-            background: #ffffff;
-            border: 1px solid #999;
-        }
-
-        .title {
-            background: #dedede;
-            border-bottom: 1px solid #999;
-            padding: 8px 11px;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        .content {
-            padding: 14px;
-        }
-
-        .row {
-            margin-bottom: 13px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 4px;
-            font-size: 13px;
-        }
-
-        input,
-        textarea {
+        input, textarea, button {
             width: 100%;
-            padding: 7px;
-            border: 1px solid #999;
-            background: #fff;
-            color: #222;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 13px;
-            outline: none;
-        }
-
-        textarea {
-            height: 105px;
-            resize: vertical;
-        }
-
-        input:focus,
-        textarea:focus {
-            border-color: #555;
-        }
-
-        .buttons {
-            border-top: 1px solid #ccc;
-            padding-top: 11px;
+            box-sizing: border-box;
+            margin-top: 10px;
+            padding: 10px;
+            background: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+            font-family: monospace;
         }
 
         button {
-            padding: 6px 13px;
-            margin-right: 5px;
-            background: #d8d8d8;
-            color: #222;
-            border: 1px solid #888;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 13px;
             cursor: pointer;
         }
 
         button:hover {
-            background: #c8c8c8;
+            background: #0f0;
+            color: #000;
         }
 
-        button:disabled {
-            color: #888;
-            background: #e5e5e5;
-            cursor: default;
-        }
-
-        #status,
-        #progress {
-            margin-top: 12px;
-            padding: 7px;
-            background: #f3f3f3;
-            border: 1px solid #bbb;
-            font-size: 12px;
-        }
-
-        .footer {
-            text-align: center;
-            color: #777;
-            font-size: 11px;
-            margin: 14px 0;
+        #log {
+            margin-top: 20px;
+            border: 1px solid #0f0;
+            padding: 10px;
+            min-height: 100px;
+            white-space: pre-wrap;
         }
     </style>
 </head>
-
 <body>
 
-<div class="top">
-    <b>Tuis Webhook Tester</b>
-</div>
+<h2>WEBHOOK TESTER</h2>
 
-<div class="main">
+<input id="webhook" type="text" placeholder="Paste your webhook URL">
 
-    <div class="title">
-        Webhook Test
-    </div>
+<textarea id="message" placeholder="Test message">Webhook test message</textarea>
 
-    <div class="content">
+<button onclick="sendMessages()">SEND 10 TEST MESSAGES</button>
 
-        <div class="row">
-            <label>Webhook URL:</label>
-
-            <input
-                id="webhook"
-                type="text"
-                placeholder="Enter webhook URL"
-            >
-        </div>
-
-        <div class="row">
-            <label>Message:</label>
-
-            <textarea
-                id="message"
-                placeholder="Enter test message"
-            ></textarea>
-        </div>
-
-        <div class="buttons">
-
-            <button
-                id="startButton"
-                onclick="startTest()"
-            >
-                Start Test
-            </button>
-
-            <button
-                id="stopButton"
-                onclick="stopTest()"
-                disabled
-            >
-                Stop
-            </button>
-
-            <button
-                id="deleteButton"
-                onclick="deleteTestMessages()"
-            >
-                Delete Test Messages
-            </button>
-
-            <button onclick="clearFields()">
-                Clear
-            </button>
-
-        </div>
-
-        <div id="status">
-            Status: Ready
-        </div>
-
-        <div id="progress">
-            Messages: 0 / 10
-        </div>
-
-    </div>
-
-</div>
-
-<div class="footer">
-    Tuis Webhook Tester
-</div>
+<div id="log">Ready.</div>
 
 <script>
-var running = false;
-var stopped = false;
+async function sendMessages() {
+    const webhook = document.getElementById("webhook").value.trim();
+    const message = document.getElementById("message").value;
+    const log = document.getElementById("log");
 
-function wait(ms) {
-    return new Promise(function(resolve) {
-        setTimeout(resolve, ms);
-    });
-}
-
-function stopTest() {
-    stopped = true;
-
-    document.getElementById("status").innerText =
-        "Status: Stopping...";
-}
-
-async function startTest() {
-
-    var webhook =
-        document.getElementById("webhook").value.trim();
-
-    var message =
-        document.getElementById("message").value;
-
-    var status =
-        document.getElementById("status");
-
-    var progress =
-        document.getElementById("progress");
-
-    if (webhook === "") {
-        status.innerText =
-            "Status: Webhook URL is empty.";
+    if (!webhook) {
+        log.textContent = "ERROR: Enter a webhook URL.";
         return;
     }
 
-    if (message === "") {
-        status.innerText =
-            "Status: Message is empty.";
-        return;
-    }
+    log.textContent = "Starting test...\n";
 
-    if (running) {
-        return;
-    }
-
-    running = true;
-    stopped = false;
-
-    document.getElementById("startButton").disabled = true;
-    document.getElementById("stopButton").disabled = false;
-    document.getElementById("deleteButton").disabled = true;
-
-    var sent = 0;
-
-    for (var i = 0; i < 10; i++) {
-
-        if (stopped) {
-            status.innerText =
-                "Status: Test stopped.";
-            break;
-        }
-
-        status.innerText =
-            "Status: Sending test " + (i + 1) + " of 10...";
-
+    for (let i = 1; i <= 10; i++) {
         try {
-
-            /*
-             * Your backend should receive the webhook and message,
-             * send the Discord request, then return the message ID.
-             *
-             * Example response:
-             * { "success": true, "messageId": "123456789" }
-             */
-
-            var response = await fetch("/api/webhook/test", {
+            const response = await fetch(webhook, {
                 method: "POST",
-
                 headers: {
                     "Content-Type": "application/json"
                 },
-
                 body: JSON.stringify({
-                    webhook: webhook,
-                    message: message
+                    content: message + " [" + i + "/10]"
                 })
             });
 
-            if (!response.ok) {
-                status.innerText =
-                    "Status: Failed - HTTP " +
-                    response.status;
-                break;
+            if (response.ok) {
+                log.textContent += "Sent message " + i + "/10\n";
+            } else {
+                log.textContent += "Message " + i + " failed: HTTP " + response.status + "\n";
             }
-
-            var data = await response.json();
-
-            if (!data.success) {
-                status.innerText =
-                    "Status: Test request failed.";
-                break;
-            }
-
-            sent++;
-
-            progress.innerText =
-                "Messages: " + sent + " / 10";
-
         } catch (error) {
-
-            status.innerText =
-                "Status: Could not connect to backend.";
-            break;
+            log.textContent += "Message " + i + " failed: " + error.message + "\n";
         }
 
-        if (i < 9) {
-            await wait(2000);
-        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 
-    if (!stopped && sent === 10) {
-
-        status.innerText =
-            "Status: 10 tests completed. Waiting 5 seconds...";
-
-        await wait(5000);
-
-        if (!stopped) {
-            status.innerText =
-                "Status: Test finished.";
-        }
-    }
-
-    running = false;
-
-    document.getElementById("startButton").disabled = false;
-    document.getElementById("stopButton").disabled = true;
-    document.getElementById("deleteButton").disabled = false;
-}
-
-async function deleteTestMessages() {
-
-    var status =
-        document.getElementById("status");
-
-    status.innerText =
-        "Status: Deleting test messages...";
-
-    try {
-
-        var response = await fetch(
-            "/api/webhook/delete-tests",
-            {
-                method: "POST"
-            }
-        );
-
-        if (!response.ok) {
-            status.innerText =
-                "Status: Delete failed - HTTP " +
-                response.status;
-            return;
-        }
-
-        var data = await response.json();
-
-        if (data.success) {
-
-            status.innerText =
-                "Status: Test messages deleted.";
-
-            document.getElementById("progress").innerText =
-                "Messages: 0 / 10";
-
-        } else {
-
-            status.innerText =
-                "Status: Nothing to delete.";
-        }
-
-    } catch (error) {
-
-        status.innerText =
-            "Status: Could not connect to backend.";
-    }
-}
-
-function clearFields() {
-
-    if (running) {
-        return;
-    }
-
-    document.getElementById("webhook").value = "";
-    document.getElementById("message").value = "";
-
-    document.getElementById("status").innerText =
-        "Status: Ready";
-
-    document.getElementById("progress").innerText =
-        "Messages: 0 / 10";
+    log.textContent += "\nFinished.";
 }
 </script>
 
